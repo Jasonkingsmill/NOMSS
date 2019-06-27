@@ -23,5 +23,15 @@ namespace Core
             return obj is OrderStatus status &&
                    Value == status.Value;
         }
+
+        public static implicit operator string(OrderStatus status)
+        {
+            return status.Value;
+        }
+
+        public static implicit operator OrderStatus(string status)
+        {
+            return new OrderStatus(status);
+        }
     }
 }
