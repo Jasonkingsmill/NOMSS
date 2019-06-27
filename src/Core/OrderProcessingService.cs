@@ -6,23 +6,29 @@ namespace Core
 {
     public class OrderProcessingService
     {
-        private readonly IOrderRepository _orderRepository;
         private readonly IProductRepository _productRepository;
 
-        public OrderProcessingService(IOrderRepository orderRepository, IProductRepository productRepository)
+        public OrderProcessingService(IProductRepository productRepository)
         {
-            _orderRepository = orderRepository;
             _productRepository = productRepository;
         }
 
-        public void ProcessOrder(int orderId)
+        public void ProcessOrder(Order order)
         {
-            var order = _orderRepository.GetById(orderId);
-            foreach(var orderItem in order.Items)
+            foreach (var orderItem in order.Items)
             {
                 var product = _productRepository.GetById(orderItem.ProductId);
-
+                try
+                {
+                    product.ReduceQuantityOnHand(orderItem.Quantity);
+                }
+                catch (InvalidOperationException)
+                {
+                    order.ChangeStatus(OrderStatus.Error_Unfulfillable);
+                    throw;
+                }
             }
+            order.ChangeStatus(OrderStatus.Fulfilled);
         }
     }
 }

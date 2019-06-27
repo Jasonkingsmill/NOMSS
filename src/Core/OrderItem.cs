@@ -7,7 +7,14 @@ namespace Core
 {
     public class OrderItem
     {
-        public int OrderId { get; set; }
+        private OrderItem() { }
+        public OrderItem(int productId, int quantity, decimal costPerItem)
+        {
+            ProductId = productId;
+            Quantity = quantity;
+            CostPerItem = costPerItem;
+        }
+
         public int ProductId { get; set; }
         public int Quantity { get; set; }
         public Decimal CostPerItem { get; set; }
