@@ -17,6 +17,12 @@ namespace Core
         }
 
         public int ProductId { get; private set; }
+
+        public bool IsStockAvailable(int quantity)
+        {
+            return QuantityOnHand >= quantity;
+        }
+
         public string Description { get; private set; }
         public int QuantityOnHand { get; private set; }
         public int ReorderThreshold { get; private set; }

@@ -13,22 +13,36 @@ namespace Core
             _productRepository = productRepository;
         }
 
+               
+
         public void ProcessOrder(Order order)
+        {
+            if (!CanFulfillOrder(order))
+            {
+                order.ChangeStatus(OrderStatus.Error_Unfulfillable);
+                throw new InvalidOperationException("Cannot fulfill order");
+            }
+
+            foreach (var orderItem in order.Items)
+            {
+                var product = _productRepository.GetById(orderItem.ProductId);
+
+                product.ReduceQuantityOnHand(orderItem.Quantity);
+            }
+            order.ChangeStatus(OrderStatus.Fulfilled);
+        }
+
+
+        private bool CanFulfillOrder(Order order)
         {
             foreach (var orderItem in order.Items)
             {
                 var product = _productRepository.GetById(orderItem.ProductId);
-                try
-                {
-                    product.ReduceQuantityOnHand(orderItem.Quantity);
-                }
-                catch (InvalidOperationException)
-                {
-                    order.ChangeStatus(OrderStatus.Error_Unfulfillable);
-                    throw;
-                }
+
+                if (!product.IsStockAvailable(orderItem.Quantity))
+                    return false;
             }
-            order.ChangeStatus(OrderStatus.Fulfilled);
+            return true;
         }
     }
 }
