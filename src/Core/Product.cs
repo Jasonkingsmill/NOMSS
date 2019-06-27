@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Core
 {
-    public class Product : Entity
+    public class Product
     {
         public Product(int productId, string description, int quantityOnHand, int reorderThreshold, int reorderAmount, int deliveryLeadTime)
         {

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 namespace Core
 {
 
-    public class Order : Entity
+    public class Order
     {
         public Order(IEnumerable<OrderItem> items)
         {
