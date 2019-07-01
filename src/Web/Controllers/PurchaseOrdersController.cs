@@ -9,7 +9,7 @@ using Web.Models;
 
 namespace Web.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/v1/[controller]")]
     [ApiController]
     public class PurchaseOrdersController : ControllerBase
     {
