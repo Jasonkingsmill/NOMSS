@@ -15,6 +15,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.IO;
 using Application;
+using Application.Events;
 
 namespace NOMSS.Web
 {
@@ -36,10 +37,15 @@ namespace NOMSS.Web
             var json = JObject.Parse(File.ReadAllText("data.json"));
             services.AddSingleton<IOrderRepository, OrderRepository>(x=> new OrderRepository(json["orders"].ToObject<List<Order>>()));
             services.AddSingleton<IProductRepository, ProductRepository>(x => new ProductRepository(json["products"].ToObject<List<Product>>()));
+            services.AddSingleton<IPurchaseOrderRepository, PurchaseOrderRepository>(x => new PurchaseOrderRepository());
 
 
             services.AddScoped<IOrderFulfilmentService, OrderFulfilmentService>();
+            services.AddScoped<IPurchaseOrderService, PurchaseOrderService>();
             services.AddScoped<OrderProcessingService>();
+            services.AddScoped<IDomainEventDispatcher, DomainEventDispatcher>();
+
+            services.AddScoped<IDomainEventHandler<QuantityOnHandBelowReorderThresholdEvent>, CreatePurchaseOrderWhenQuantityOnHandBelowThresholdEventHandler>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
