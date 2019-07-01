@@ -1,4 +1,4 @@
-﻿using Core;
+﻿ using Core;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -7,16 +7,18 @@ using Moq;
 
 namespace UnitTests
 {
-    public class Order_Tests
+    public class OrderProcessingService_Tests
     {
-        public class Fulfill : Order_Tests
+        public class Fulfill : OrderProcessingService_Tests
         {
             private Mock<IProductRepository> _productRepository;
+            private Mock<IPurchaseOrderRepository> _purchaseOrderRepository;
+            private Mock<IDomainEventDispatcher> _domainEventDispatcher;
             private OrderProcessingService _orderProcessingService;
 
             public Fulfill()
             {
-
+                _domainEventDispatcher = new Mock<IDomainEventDispatcher>();
             }
 
             [Fact]
@@ -41,7 +43,10 @@ namespace UnitTests
 
                 _productRepository = new Mock<IProductRepository>();
                 _productRepository.Setup(x => x.GetById(It.Is<int>(p => p == productId))).Returns(product);
-                _orderProcessingService = new OrderProcessingService(_productRepository.Object);
+                _purchaseOrderRepository = new Mock<IPurchaseOrderRepository>();
+                _purchaseOrderRepository.Setup(x => x.Add(It.IsAny<PurchaseOrder>()));
+
+                _orderProcessingService = new OrderProcessingService(_productRepository.Object, _purchaseOrderRepository.Object, _domainEventDispatcher.Object);
 
 
                 // Act
@@ -52,6 +57,8 @@ namespace UnitTests
                 Assert.Equal(OrderStatus.Fulfilled, order.Status);
                 Assert.Equal(quantityOnHand - orderQuantity, product.QuantityOnHand);
             }
+
+
         }
     }
 }
