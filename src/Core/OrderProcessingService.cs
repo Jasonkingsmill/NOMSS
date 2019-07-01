@@ -7,10 +7,14 @@ namespace Core
     public class OrderProcessingService
     {
         private readonly IProductRepository _productRepository;
+        private readonly IPurchaseOrderRepository _purchaseOrderRepository;
+        private readonly IDomainEventDispatcher _domainEventDispatcher;
 
-        public OrderProcessingService(IProductRepository productRepository)
+        public OrderProcessingService(IProductRepository productRepository, IPurchaseOrderRepository purchaseOrderRepository, IDomainEventDispatcher domainEventDispatcher)
         {
             _productRepository = productRepository;
+            _purchaseOrderRepository = purchaseOrderRepository;
+            _domainEventDispatcher = domainEventDispatcher;
         }
 
                
@@ -27,7 +31,7 @@ namespace Core
             {
                 var product = _productRepository.GetById(orderItem.ProductId);
 
-                product.ReduceQuantityOnHand(orderItem.Quantity);
+                product.ReduceQuantityOnHand(_domainEventDispatcher, orderItem.Quantity);
             }
             order.ChangeStatus(OrderStatus.Fulfilled);
         }

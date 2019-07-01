@@ -29,12 +29,21 @@ namespace Core
         public int ReorderAmount { get; private set; }
         public int DeliveryLeadTime { get; private set; }
 
-        public void ReduceQuantityOnHand(int amount)
+        public void ReduceQuantityOnHand(IDomainEventDispatcher domainEventDispatcher, int amount)
         {
             if (QuantityOnHand - amount < 0)
                 throw new InvalidOperationException("Cannot reduce quantity on hand below 0");
             
             QuantityOnHand = QuantityOnHand - amount;
+
+            if (RequiresReorder())
+                domainEventDispatcher.Dispatch(new QuantityOnHandBelowReorderThresholdEvent(ProductId, ReorderAmount));
+        }
+
+
+        private bool RequiresReorder()
+        {
+            return QuantityOnHand < ReorderThreshold;
         }
 
   
