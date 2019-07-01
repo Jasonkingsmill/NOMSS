@@ -22,14 +22,10 @@ namespace Application
             foreach (var orderId in orderIds)
             {
                 var order = _orderRepository.GetById(orderId);
-                try
-                {
-                    _orderProcessingService.ProcessOrder(order);
-                }
-                catch
-                {
+
+                if (!_orderProcessingService.ProcessOrder(order))
                     unfulfilledOrders.Add(orderId);
-                }
+
             }
             return unfulfilledOrders;
         }

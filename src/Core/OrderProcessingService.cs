@@ -19,12 +19,12 @@ namespace Core
 
                
 
-        public void ProcessOrder(Order order)
+        public bool ProcessOrder(Order order)
         {
             if (!CanFulfillOrder(order))
             {
                 order.ChangeStatus(OrderStatus.Error_Unfulfillable);
-                throw new InvalidOperationException("Cannot fulfill order");
+                return false;
             }
 
             foreach (var orderItem in order.Items)
@@ -34,6 +34,7 @@ namespace Core
                 product.ReduceQuantityOnHand(_domainEventDispatcher, orderItem.Quantity);
             }
             order.ChangeStatus(OrderStatus.Fulfilled);
+            return true;
         }
 
 
